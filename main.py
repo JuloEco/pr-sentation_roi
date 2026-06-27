@@ -757,7 +757,91 @@ body {
     <p>Intrigues &amp; Couronne · Version Alpha-0.1 · Tous droits réservés</p>
   </footer>
 
-  <script src="/static/js/main.js"></script>
+  <script>
+  /* ============================================================
+   INTRIGUES & COURONNE — main.js
+   ============================================================ */
+
+// ---- Config tabs ----
+document.querySelectorAll('.config-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    const nb = tab.dataset.nb;
+
+    document.querySelectorAll('.config-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.config-panel').forEach(p => p.classList.remove('active'));
+
+    tab.classList.add('active');
+    document.querySelector(`.config-panel[data-nb="${nb}"]`).classList.add('active');
+  });
+});
+
+// ---- Scroll reveal ----
+const revealEls = document.querySelectorAll(
+  '.gauge-card, .role-card, .pillar, .pouvoir-card, .config-role-chip, .ruin-block, .victory-block'
+);
+
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('revealed');
+      observer.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.1 });
+
+revealEls.forEach(el => {
+  el.classList.add('hidden-before-reveal');
+  observer.observe(el);
+});
+
+// Inject reveal styles dynamically
+const style = document.createElement('style');
+style.textContent = `
+  .hidden-before-reveal {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+  .hidden-before-reveal.revealed {
+    opacity: 1;
+    transform: translateY(0);
+  }
+`;
+document.head.appendChild(style);
+
+// ---- Gauge bar animation on scroll ----
+const gaugeFills = document.querySelectorAll('.gauge-fill');
+const gaugeObserver = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const el = entry.target;
+      const target = el.style.width;
+      el.style.width = '0%';
+      requestAnimationFrame(() => {
+        setTimeout(() => { el.style.width = target; }, 100);
+      });
+      gaugeObserver.unobserve(el);
+    }
+  });
+}, { threshold: 0.5 });
+
+gaugeFills.forEach(el => gaugeObserver.observe(el));
+
+// ---- Active nav highlight on scroll (optional) ----
+const sections = document.querySelectorAll('section[id]');
+window.addEventListener('scroll', () => {
+  let current = '';
+  sections.forEach(section => {
+    if (window.scrollY >= section.offsetTop - 200) {
+      current = section.getAttribute('id');
+    }
+  });
+  // Can be used to highlight a nav if one is added later
+  // document.querySelectorAll('a[href^="#"]').forEach(a => {
+  //   a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+  // });
+}, { passive: true });
+  </script>
 </body>
 </html>"""
 ROLES = [
