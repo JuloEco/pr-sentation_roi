@@ -840,7 +840,7 @@ CONFIGS = {
 @app.route("/")
 def index():
     roles_by_id = {r["id"]: r for r in ROLES}
-    return render_template("index.html", roles=ROLES, configs=CONFIGS, roles_by_id=roles_by_id)
+    return render_template_string(HTML, roles=ROLES, configs=CONFIGS, roles_by_id=roles_by_id)
 
 if __name__ == "__main__":
     app.run(debug=True)
